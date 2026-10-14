@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 900" preserveAspectRatio="none">
+ <defs><g id="fir"><path d="M-3 0h6v-18h-6z" fill="#274c62"/><path d="M0-116-28-62h12l-26 42h15L-50 0H50L27-20h15L16-62h12z" fill="#274c62"/></g></defs>
+ <path d="M0 120Q100 300 177 500T420 900H0Z" fill="#7da8bd"/>
+ <path d="M0 120Q92 294 177 500T420 900" fill="none" stroke="#e8f5f9" stroke-width="32"/>
+ <path d="M0 300Q90 455 155 620T340 900H0Z" fill="#d9ecf3" opacity=".5"/>
+ <use href="#fir" transform="translate(38 414) scale(.7)"/><use href="#fir" transform="translate(118 592) scale(.9)"/><use href="#fir" transform="translate(34 695) scale(1.05)"/><use href="#fir" transform="translate(208 813) scale(.85)"/><use href="#fir" transform="translate(87 862) scale(1.15)"/>
+</svg>
