@@ -98,11 +98,17 @@
     .slope-left { left:0; }
     .slope-right { right:0; transform:scaleX(-1); }
     .envelope { position:relative; width:min(90vw,530px); height:220px; margin:0 auto 36px; filter:drop-shadow(0 22px 24px #031e3580); }
-    .envelope-back { position:absolute; inset:0; background:#dcecf4; border-radius:8px; }
-    .envelope-flap { position:absolute; inset:0; clip-path:polygon(0 0,100% 0,50% 58%); background:#bad5e4; }
-    .envelope-front { position:absolute; inset:0; clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%); background:linear-gradient(145deg,#e8f4fa,#c8e0ed); border-radius:8px; }
+    .envelope-back { position:absolute; inset:0; z-index:0; background:#dcecf4; border-radius:8px; }
+    .envelope-letter { position:absolute; z-index:1; left:10%; right:10%; top:12px; height:190px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; border-radius:4px; background:#fffaf1; color:#17415d; box-shadow:0 2px 12px #15364c33; font-family:Georgia,serif; font-size:clamp(20px,4vw,31px); }
+    .envelope-letter small { font:600 12px Arial,sans-serif; letter-spacing:.13em; text-transform:uppercase; }
+    .envelope-flap { position:absolute; z-index:3; inset:0; clip-path:polygon(0 0,100% 0,50% 58%); background:#bad5e4; transform-origin:50% 0; backface-visibility:visible; }
+    .envelope-front { position:absolute; z-index:2; inset:0; clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%); background:linear-gradient(145deg,#e8f4fa,#c8e0ed); border-radius:8px; }
+    .envelope.is-opening .envelope-flap { animation:open-flap .85s ease-in-out .25s both; }
+    .envelope.is-opening .envelope-letter { animation:raise-letter 1.35s cubic-bezier(.2,.7,.2,1) 1s both; }
+    @keyframes open-flap { to { transform:rotateX(180deg); z-index:0; } }
+    @keyframes raise-letter { 0% { transform:translateY(0); } 70%,100% { transform:translateY(-115px); } }
     .envelope-label { position:absolute; z-index:2; left:4%; right:4%; bottom:21px; color:#17415d; font-size:clamp(18px,3vw,28px); font-weight:600; line-height:1.4; text-shadow:0 1px #fff9; }
-    .stamps { position:absolute; z-index:3; top:13px; left:17px; right:17px; display:flex; justify-content:space-between; align-items:flex-start; }
+    .stamps { position:absolute; z-index:4; top:13px; left:17px; right:17px; display:flex; justify-content:space-between; align-items:flex-start; }
     .stamp:first-child { transform:rotate(-4deg); }
     .stamp:last-child { transform:rotate(3deg); }
     .stamp { width:74px; height:81px; padding:5px; background:#f7faf7; border:2px dotted #7193a6; border-radius:3px; box-shadow:0 3px 8px #234c6588; }
@@ -110,10 +116,11 @@
     @media (max-width:580px) { .stamps { top:13px; left:12px; right:12px; } .stamp { width:57px; height:66px; padding:4px; } .slope-decor { width:32vw; } }
     .open-invitation { border:1px solid #e5f1f7; border-radius:999px; background:#f0f8fc; color:#123b57; padding:17px 24px; min-height:56px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 8px 22px #08284155; }
     .open-invitation:hover { background:#fff; }
+    .invitation-card.is-opening .open-invitation { opacity:0; pointer-events:none; transition:opacity .25s ease; }
     .open-invitation:focus-visible,.music-toggle:focus-visible { outline:3px solid #fff; outline-offset:4px; }
     .music-toggle { position:fixed; z-index:20; right:18px; bottom:18px; display:none; border:1px solid #b9d7e6; border-radius:999px; background:#123b57; color:#fff; padding:12px 16px; font-size:11px; cursor:pointer; box-shadow:0 5px 18px #092a4244; }
     .music-toggle.is-visible { display:block; }
-    @media (prefers-reduced-motion:reduce) { .invitation-overlay { transition:none; } }
+    @media (prefers-reduced-motion:reduce) { .invitation-overlay { transition:none; } .envelope.is-opening .envelope-flap,.envelope.is-opening .envelope-letter { animation:none; } }
     .footer-inner { max-width:1180px; margin:auto; display:flex; align-items:end; justify-content:space-between; gap:24px; }
     .footer-main { text-align:left; }
     .footer-credit { max-width:360px; text-align:right; font-size:10px; line-height:1.5; color:#b9d5e4; }
@@ -250,6 +257,7 @@
 
     .family-name { font-weight:500; }
     .video-placeholder { width:100%; max-width:430px; aspect-ratio:1 / 1.08; border-radius:50%; background:linear-gradient(155deg,#4c8bb4,#235576); box-shadow:inset 0 0 0 8px #c5e2ef,0 22px 50px #16405b15; margin:auto; }
+    .video-caption { max-width:430px; margin:22px auto 0; text-align:center; color:#285473; font-size:clamp(17px,2vw,22px); font-weight:600; line-height:1.35; }
     @media(max-width:750px) { .video-placeholder { max-width:340px; } }
   
     /* Final invitation refinements */
@@ -284,7 +292,7 @@
 <body class="invite-locked">
   <div class="invitation-overlay" id="invitation-overlay" role="dialog" aria-modal="true" aria-label="Свадебное приглашение">
     <div class="slope-decor slope-left" aria-hidden="true"></div><div class="slope-decor slope-right" aria-hidden="true"></div>
-    <div class="invitation-card"><div class="envelope" aria-hidden="true"><div class="envelope-back"></div><div class="envelope-flap"></div><div class="envelope-front"></div><div class="stamps"><div class="stamp"><img src="assets/stamp-ski-wedding.svg" alt=""></div><div class="stamp"><img src="assets/stamp-campfire.svg" alt=""></div></div><div class="envelope-label">Свадьба К+Л / 26.02</div></div><button class="open-invitation" id="open-invitation" type="button">Посмотреть приглашение</button></div>
+    <div class="invitation-card"><div class="envelope" id="envelope" aria-hidden="true"><div class="envelope-back"></div><div class="envelope-letter">Свадьба К+Л / 26.02</div><div class="envelope-flap"></div><div class="envelope-front"></div><div class="stamps"><div class="stamp"><img src="assets/stamp-ski-wedding.svg" alt=""></div><div class="stamp"><img src="assets/stamp-campfire.svg" alt=""></div></div><div class="envelope-label">Приглашение</div></div><button class="open-invitation" id="open-invitation" type="button">Открыть конверт</button></div>
   </div>
   <audio id="wedding-music" src="assets/wedding-music.mp3" preload="none" loop></audio>
   <button class="music-toggle" id="music-toggle" type="button" aria-label="Выключить Токсиса">♫ Выключить Токсиса</button>
@@ -306,10 +314,10 @@
   <main>
     <div class="intro-landscape">
     <section class="section intro" aria-labelledby="intro-title">
-      <div><div class="section-label">Два дня рядом</div><h2 id="intro-title"><span class="fixed-heading-line">Прекрасный повод</span><span class="fixed-heading-line">встретиться всем</span><span class="fixed-heading-line">вместе зимой</span></h2><p>Днем покатаемся на лыжах, сноубордах и коньках, вечером соберемся в чуме - отпразднуем, споем и потанцуем. На следующее утро - позавтракаем и насладимся баней.</p></div>
-      <div class="video-placeholder" role="img" aria-label="Место для нашего видеообращения"></div>
+      <div><h2 id="intro-title"><span class="fixed-heading-line">Прекрасный повод</span><span class="fixed-heading-line">встретиться всем</span><span class="fixed-heading-line">вместе зимой</span></h2><p>Днем покатаемся на лыжах, сноубордах и коньках, вечером соберемся в чуме - отпразднуем, споем и потанцуем. На следующее утро - позавтракаем и насладимся баней.</p></div>
+      <div><div class="video-placeholder" role="img" aria-label="Место для нашего видеообращения"></div><div class="video-caption">Мы тут что-то важное говорим —<br>послушайте</div></div>
     </section>
-<div class="background-scene rink-scene" aria-hidden="true"><svg viewBox="0 0 1440 440" preserveAspectRatio="xMidYMax meet"><path d="M0 304q400-35 750-10t690 10v136H0z" fill="#dcecf3" /><g transform="translate(70 340) scale(0.65)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(195 323) scale(0.75)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(285 306) scale(0.4)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1185 309) scale(0.42)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1290 328) scale(0.72)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1400 347) scale(0.55)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><ellipse cx="725" cy="349" rx="410" ry="74" fill="#98c9df" stroke="#fcffff" stroke-width="8" /><path d="M315 349C315 250 1135 250 1135 349L1135 326C1135 227 315 227 315 326Z" fill="#f6fbfd" stroke="#719eb4" stroke-width="2"/><path d="M315 326C315 227 1135 227 1135 326" fill="none" stroke="#b7737d" stroke-width="5"/><ellipse cx="725" cy="349" rx="330" ry="48" fill="none" stroke="#cae6f2" stroke-width="3" /><path d="M290 340V172M1160 340V172" stroke="#59859b" stroke-width="5" /><path d="M290 187q435 28 870 0" stroke="#839fab" stroke-width="2" fill="none" /><circle cx="414.5" cy="192.04" r="3.7" fill="#ffe0a5" /><circle cx="492.0" cy="195.96" r="3.7" fill="#ffe0a5" /><circle cx="569.5" cy="198.76" r="3.7" fill="#ffe0a5" /><circle cx="647.0" cy="200.44" r="3.7" fill="#ffe0a5" /><circle cx="724.5" cy="201.0" r="3.7" fill="#ffe0a5" /><circle cx="802.0" cy="200.44" r="3.7" fill="#ffe0a5" /><circle cx="879.5" cy="198.76" r="3.7" fill="#ffe0a5" /><circle cx="957.0" cy="195.96" r="3.7" fill="#ffe0a5" /><circle cx="1034.5" cy="192.04" r="3.7" fill="#ffe0a5" /><path d="M273 341q17-11 34 0M1143 341q17-11 34 0" fill="#edf6fa" stroke="#edf6fa" stroke-width="9"/><g transform="translate(575 354) scale(0.65 0.65)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#5989ab" /><path d="M-13-51-30-38m44-13 16 16" stroke="#5989ab" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#5989ab" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#e7bb9c" stroke-width="6" /></g><g transform="translate(813 369) scale(-0.71 0.71)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#b789a2" /><path d="M-13-51-30-38m44-13 16 16" stroke="#b789a2" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#b789a2" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#edf7fc" stroke-width="6" /></g><g transform="translate(950 330) scale(0.5 0.5)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#63959e" /><path d="M-13-51-30-38m44-13 16 16" stroke="#63959e" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#63959e" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#f1d398" stroke-width="6" /></g><g transform="translate(200 405)"><ellipse cx="40" cy="3" rx="48" ry="6" fill="#a2c4d5" opacity=".35" /><path d="M7-12V1m63-13V1M16-19v17m63-17v17" stroke="#52758a" stroke-width="4" stroke-linecap="round" /><path d="M3-24V-9m68-15v15" stroke="#52758a" stroke-width="4" /><path d="M0-29h73v6H0zm0 9h73v6H0z" fill="#a58e76" /><path d="m-3-13 77 0 10 6H6z" fill="#c0a58a" /><path d="M6-7h78v4H6z" fill="#927b69" /><path d="M0-29h73" stroke="#f4fbfd" stroke-width="2" /></g><g transform="translate(1160 405)"><ellipse cx="40" cy="3" rx="48" ry="6" fill="#a2c4d5" opacity=".35" /><path d="M7-12V1m63-13V1M16-19v17m63-17v17" stroke="#52758a" stroke-width="4" stroke-linecap="round" /><path d="M3-24V-9m68-15v15" stroke="#52758a" stroke-width="4" /><path d="M0-29h73v6H0zm0 9h73v6H0z" fill="#a58e76" /><path d="m-3-13 77 0 10 6H6z" fill="#c0a58a" /><path d="M6-7h78v4H6z" fill="#927b69" /><path d="M0-29h73" stroke="#f4fbfd" stroke-width="2" /></g><path d="M315 349C315 448 1135 448 1135 349V371C1135 459 315 459 315 371Z" fill="#eff8fc" stroke="#759fb3" stroke-width="2"/><path d="M315 349C315 448 1135 448 1135 349" fill="none" stroke="#b7737d" stroke-width="5"/><g fill="none" stroke="#c44750" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M390 365v-43h57v43"/><path d="M1003 365v-43h57v43"/></g></svg></div>
+<div class="background-scene rink-scene" aria-hidden="true"><svg viewBox="0 0 1440 440" preserveAspectRatio="xMidYMax meet"><path d="M0 304q400-35 750-10t690 10v136H0z" fill="#dcecf3" /><g transform="translate(70 340) scale(0.65)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(195 323) scale(0.75)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(285 306) scale(0.4)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1185 309) scale(0.42)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1290 328) scale(0.72)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><g transform="translate(1400 347) scale(0.55)"><ellipse cx="0" cy="2" rx="44" ry="5" fill="#7398aa" opacity=".16" /><path d="M-5 0h10v-23H-5z" fill="#6094ab" /><path d="M0-132-31-70h16l-29 44h23L-56 0H56L21-26h23L15-70h16z" fill="#6094ab" /><path d="M0-132-21-91h42zM0-76-31-31h62z" fill="#cce9f2" opacity=".65" /></g><ellipse cx="725" cy="349" rx="410" ry="74" fill="#98c9df" stroke="#fcffff" stroke-width="8" /><path d="M315 349C315 250 1135 250 1135 349L1135 326C1135 227 315 227 315 326Z" fill="#f6fbfd" stroke="#719eb4" stroke-width="2"/><path d="M315 326C315 227 1135 227 1135 326" fill="none" stroke="#b7737d" stroke-width="5"/><ellipse cx="725" cy="349" rx="330" ry="48" fill="none" stroke="#cae6f2" stroke-width="3" /><path d="M290 340V172M1160 340V172" stroke="#59859b" stroke-width="5" /><path d="M290 187q435 28 870 0" stroke="#839fab" stroke-width="2" fill="none" /><circle cx="414.5" cy="192.04" r="3.7" fill="#ffe0a5" /><circle cx="492.0" cy="195.96" r="3.7" fill="#ffe0a5" /><circle cx="569.5" cy="198.76" r="3.7" fill="#ffe0a5" /><circle cx="647.0" cy="200.44" r="3.7" fill="#ffe0a5" /><circle cx="724.5" cy="201.0" r="3.7" fill="#ffe0a5" /><circle cx="802.0" cy="200.44" r="3.7" fill="#ffe0a5" /><circle cx="879.5" cy="198.76" r="3.7" fill="#ffe0a5" /><circle cx="957.0" cy="195.96" r="3.7" fill="#ffe0a5" /><circle cx="1034.5" cy="192.04" r="3.7" fill="#ffe0a5" /><path d="M273 341q17-11 34 0M1143 341q17-11 34 0" fill="#edf6fa" stroke="#edf6fa" stroke-width="9"/><g transform="translate(575 354) scale(0.65 0.65)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#5989ab" /><path d="M-13-51-30-38m44-13 16 16" stroke="#5989ab" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#5989ab" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#e7bb9c" stroke-width="6" /></g><g transform="translate(813 369) scale(-0.71 0.71)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#b789a2" /><path d="M-13-51-30-38m44-13 16 16" stroke="#b789a2" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#b789a2" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#edf7fc" stroke-width="6" /></g><g transform="translate(950 330) scale(0.5 0.5)" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-22-14-3h12l10-23m3 0 15 21h11L22-29" stroke="#24455e" stroke-width="9" fill="none" /><path d="M-17 0H-2m23 0h18" stroke="#edf8fc" stroke-width="7" /><path d="M-19 6H1m19 0h23" stroke="#426b86" stroke-width="2" /><path d="M-12-60q-10 9-9 24l-2 15q18 7 43 0l-2-17q0-17-12-22z" fill="#63959e" /><path d="M-13-51-30-38m44-13 16 16" stroke="#63959e" stroke-width="11" fill="none" /><circle cx="-31" cy="-37" r="5" fill="#24455e" /><circle cx="30" cy="-34" r="5" fill="#24455e" /><path d="M0-53v29" stroke="#e0eff5" stroke-width="1.5" /><circle cx="0" cy="-73" r="11" fill="#efcbb7" /><path d="M-12-76q0-16 15-14 12 1 11 14z" fill="#63959e" /><path d="M-11-76h25" stroke="#edf5f8" stroke-width="4" /><circle cx="2" cy="-92" r="4" fill="#edf5f8" /><circle cx="5" cy="-71" r="1.3" fill="#314859" /><path d="M1-66q3 2 6 0" stroke="#ad826f" stroke-width="1" fill="none" /><path d="M-10-61h20m-4 0 8 18" stroke="#f1d398" stroke-width="6" /></g><g transform="translate(200 405)"><ellipse cx="40" cy="3" rx="48" ry="6" fill="#a2c4d5" opacity=".35" /><path d="M7-12V1m63-13V1M16-19v17m63-17v17" stroke="#52758a" stroke-width="4" stroke-linecap="round" /><path d="M3-24V-9m68-15v15" stroke="#52758a" stroke-width="4" /><path d="M0-29h73v6H0zm0 9h73v6H0z" fill="#a58e76" /><path d="m-3-13 77 0 10 6H6z" fill="#c0a58a" /><path d="M6-7h78v4H6z" fill="#927b69" /><path d="M0-29h73" stroke="#f4fbfd" stroke-width="2" /></g><g transform="translate(1160 405)"><ellipse cx="40" cy="3" rx="48" ry="6" fill="#a2c4d5" opacity=".35" /><path d="M7-12V1m63-13V1M16-19v17m63-17v17" stroke="#52758a" stroke-width="4" stroke-linecap="round" /><path d="M3-24V-9m68-15v15" stroke="#52758a" stroke-width="4" /><path d="M0-29h73v6H0zm0 9h73v6H0z" fill="#a58e76" /><path d="m-3-13 77 0 10 6H6z" fill="#c0a58a" /><path d="M6-7h78v4H6z" fill="#927b69" /><path d="M0-29h73" stroke="#f4fbfd" stroke-width="2" /></g><path d="M315 349C315 448 1135 448 1135 349V371C1135 459 315 459 315 371Z" fill="#eff8fc" stroke="#759fb3" stroke-width="2"/><path d="M315 349C315 448 1135 448 1135 349" fill="none" stroke="#b7737d" stroke-width="5"/></svg></div>
     </div>
     <section class="program-wrap" id="program" aria-labelledby="program-title"><div class="section">
       <div class="section-label">Наш план</div><div class="program-heading"><h2 id="program-title">Программа праздника</h2><p>Время ориентировочное: главное — это провести время вместе.</p></div>
@@ -385,30 +393,62 @@
   <footer><div class="footer-inner"><div class="footer-main"><span class="serif">Катюша и Лешик</span>Увидимся в Подолино · 26–27 февраля 2027 года</div><div class="footer-credit">Приглашение сделано нами с душой и любовью при экспертной поддержке ГПТ :)</div></div></footer>
 <script>
 const invitationOverlay=document.getElementById('invitation-overlay');
+const envelope=document.getElementById('envelope');
 const openInvitation=document.getElementById('open-invitation');
 const weddingMusic=document.getElementById('wedding-music');
 const musicToggle=document.getElementById('music-toggle');
+let musicOptedOut=false;
+let openingStarted=false;
 function updateMusicButton() {
  const playing=!weddingMusic.paused;
  musicToggle.textContent=playing?'♫ Выключить Токсиса':'♫ Включить Токсиса';
  musicToggle.setAttribute('aria-label',playing?'Выключить Токсиса':'Включить Токсиса');
 }
-openInvitation.addEventListener('click',async()=>{
+async function tryAutoMusic(){
+ if(musicOptedOut||!weddingMusic.paused)return;
+ try { await weddingMusic.play(); } catch(e) { /* Browser may require a gesture. */ }
+ updateMusicButton();
+}
+function resumeMusicOnGesture(event){
+ if(!openingStarted)return;
+ if(event.target instanceof Element && event.target.closest('#music-toggle'))return;
+ tryAutoMusic();
+}
+document.addEventListener('pointerdown',resumeMusicOnGesture,{passive:true});
+document.addEventListener('keydown',resumeMusicOnGesture);
+weddingMusic.addEventListener('play',updateMusicButton);
+weddingMusic.addEventListener('pause',updateMusicButton);
+function showInvitation(){
  document.body.classList.remove('invite-locked');
  invitationOverlay.classList.add('is-open');
  invitationOverlay.setAttribute('aria-hidden','true');
  musicToggle.classList.add('is-visible');
  musicToggle.focus();
- try { await weddingMusic.play(); } catch(e) { /* The visitor can start it with the music button. */ }
  updateMusicButton();
+ tryAutoMusic();
+}
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+openInvitation.addEventListener('click',()=>{
+ if(openingStarted)return;
+ openingStarted=true;
+ tryAutoMusic();
+ openInvitation.disabled=true;
+ envelope.parentElement.classList.add('is-opening');
+ envelope.classList.add('is-opening');
+ setTimeout(showInvitation,reducedMotion?350:2900);
 });
-musicToggle.addEventListener('click',async()=>{
- if(weddingMusic.paused) { try { await weddingMusic.play(); } catch(e) {} }
- else weddingMusic.pause();
- updateMusicButton();
+document.addEventListener('keydown',event=>{
+ if(event.key==='Tab'&&!invitationOverlay.classList.contains('is-open')) {
+  event.preventDefault();
+  if(!openingStarted)openInvitation.focus();
+ }
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Tab'&&!invitationOverlay.classList.contains('is-open')) { e.preventDefault(); openInvitation.focus(); } });
 openInvitation.focus();
+musicToggle.addEventListener('click',async()=>{
+ if(weddingMusic.paused) { musicOptedOut=false; try { await weddingMusic.play(); } catch(e) {} }
+ else { musicOptedOut=true; weddingMusic.pause(); }
+ updateMusicButton();
+});
 function fitWeddingHeadline() {
  const title=document.querySelector('h1');
  const width=title.clientWidth;
